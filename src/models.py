@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 from .database import Base
 
 class User(Base):
@@ -14,3 +14,4 @@ class OTP(Base):
     otp = Column(String, index=True)
     phone_number = Column(String, index=True)
     count = Column(Integer, default=0)
+    verified = Column(Boolean, default=False)
