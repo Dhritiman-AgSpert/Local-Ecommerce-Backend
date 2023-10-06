@@ -51,8 +51,8 @@ async def phone(user_phone: str, db: Session = Depends(database.get_db)):
     
     # Generate OTP and send it to the user 
     generated_otp = gene_otp()
-    # sent = send_otp(user_phone, generated_otp)
-    sent = True
+    sent = send_otp(user_phone, generated_otp)
+    # sent = True
     
     if sent:
         otp_create = schema.OTPCreate(
