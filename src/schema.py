@@ -1,4 +1,28 @@
 from pydantic import BaseModel
+from typing import List, Optional
+
+
+
+class AddressBase(BaseModel):
+    name: str
+    house: str
+    street: str
+    city: str
+    pincode: str
+
+class AddressCreate(AddressBase):
+    pass
+
+class AddressUpdate(AddressBase):
+    id: int
+
+class Address(AddressBase):
+    id: int
+    owner_id: int
+
+    class Config:
+        from_attributes = True
+
 
 class Token(BaseModel):
     access_token: str
@@ -7,18 +31,7 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: str | None = None
     scopes: list[str] = []
-        
-class UserBase(BaseModel):
-    phone_number: str
 
-class UserCreate(UserBase):
-    pass
-
-class User(UserBase):
-    id: int
-
-    class Config:
-        from_attributes = True
 
 class OTPBase(BaseModel):
     otp: str
@@ -34,3 +47,19 @@ class OTP(OTPBase):
 
     class Config:
         from_attributes = True
+
+
+class UserBase(BaseModel):
+    phone_number: str
+    addresses: List[Address] = []
+
+class UserCreate(UserBase):
+    pass
+
+class User(UserBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+

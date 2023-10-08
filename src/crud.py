@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from . import models, schema
 
 def get_user_by_phone(db: Session, phone_number: str):
@@ -11,6 +11,10 @@ def create_user(db: Session, user: schema.UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def get_user(db: Session, user_id: int):
+    return db.query(models.User).filter(models.User.id == user_id).options(joinedload(models.User.addresses)).first()
+
 
 def get_otp_by_phone(db: Session, phone_number: str):
     return db.query(models.OTP).filter(models.OTP.phone_number == phone_number).first()
@@ -32,3 +36,38 @@ def update_otp(db: Session, otp: schema.OTPCreate):
     db.commit()
     db.refresh(db_otp)
     return db_otp
+
+
+def get_address(db: Session, id: int):
+    return db.query(models.Address).filter(models.Address.id == id).first()
+
+def get_addresses(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Address).offset(skip).limit(limit).all()
+
+def validate_address(address: dict, allowed_pincodes: list = models.PINCODE_CHOICES):
+    if address["pincode"] in allowed_pincodes:
+        return True
+    return False
+
+def create_user_address(db: Session, address: schema.AddressCreate, user_id: int):
+    if not validate_address(address.model_dump()):
+        raise HTTPException(status_code=400, detail="Invalid pincode")
+    
+    db_address = models.Address(**address.model_dump(), owner_id=user_id)
+    db.add(db_address)
+    db.commit()
+    db.refresh(db_address)
+    return db_address
+
+def update_user_address(db: Session, address: schema.AddressUpdate):
+    if not validate_address(address.model_dump()):
+        raise HTTPException(status_code=400, detail="Invalid pincode")
+    
+    db.query(models.Address).filter(models.Address.id == address.id).update(address.model_dump())
+    db.commit()
+    return get_address(db, id=address.id)
+
+def delete_user_address(db: Session, id: int):
+    address = get_address(db, id=id)
+    db.delete(address)
+    db.commit()

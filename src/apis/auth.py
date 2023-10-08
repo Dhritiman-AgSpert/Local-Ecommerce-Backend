@@ -51,8 +51,8 @@ async def phone(user_phone: str, db: Session = Depends(database.get_db)):
     
     # Generate OTP and send it to the user 
     generated_otp = gene_otp()
-    sent = send_otp(user_phone, generated_otp)
-    # sent = True
+    # sent = send_otp(user_phone, generated_otp)
+    sent = True
     
     if sent:
         otp_create = schema.OTPCreate(
@@ -116,13 +116,13 @@ async def get_current_user(request: Request, token: Optional[str] = Header(None)
     )
     try:
         if token:
-            print("token", token)
+            # print("token", token)
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             phone_number: str = payload.get("sub")
             if phone_number is None:
                 raise credentials_exception
         elif authorization:
-            print("authorization", authorization)
+            # print("authorization", authorization)
             payload = jwt.decode(authorization, SECRET_KEY, algorithms=[ALGORITHM])
             phone_number: str = payload.get("sub")
             if phone_number is None:
@@ -136,3 +136,10 @@ async def get_current_user(request: Request, token: Optional[str] = Header(None)
         raise credentials_exception
     return user
 
+
+@router.get("/me", response_model=schema.User)
+async def user_info(current_user: schema.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
+    db_user = crud.get_user(db, user_id=current_user.id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
