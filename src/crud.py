@@ -13,7 +13,13 @@ def create_user(db: Session, user: schema.UserCreate):
     return db_user
 
 def get_user(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).options(joinedload(models.User.addresses)).first()
+    return db.query(
+        models.User
+    ).filter(
+        models.User.id == user_id
+    ).options(
+        joinedload(models.User.addresses)
+    ).first()
 
 
 def get_otp_by_phone(db: Session, phone_number: str):
