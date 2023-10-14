@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum, Numeric
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -34,9 +34,13 @@ class Address(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(256), nullable=False)
+    phone = Column(String(10), nullable=False)
     house = Column(String(256), nullable=False)
     street = Column(String(256), nullable=False)
+    area = Column(String(256), nullable=False)
     city = Column(String(256), nullable=False)
     pincode = Column(Enum(*PINCODE_CHOICES, name='pincode'), nullable=False)
+    lat = Column(Numeric(precision=9, scale=6), nullable=False)
+    lng = Column(Numeric(precision=9, scale=6), nullable=False)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     owner = relationship("User", back_populates="addresses")

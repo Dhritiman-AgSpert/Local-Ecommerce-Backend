@@ -2,13 +2,17 @@ from pydantic import BaseModel
 from typing import List
 
 
-
+# Address
 class AddressBase(BaseModel):
     name: str
+    phone: str
     house: str
     street: str
+    area: str
     city: str
     pincode: str
+    lat: float
+    lng: float
 
 class AddressCreate(AddressBase):
     pass
@@ -23,7 +27,7 @@ class Address(AddressBase):
     class Config:
         from_attributes = True
 
-
+# Token
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -32,7 +36,7 @@ class TokenData(BaseModel):
     username: str | None = None
     scopes: list[str] = []
 
-
+# OTP
 class OTPBase(BaseModel):
     otp: str
     phone_number: str
@@ -48,7 +52,7 @@ class OTP(OTPBase):
     class Config:
         from_attributes = True
 
-
+# User
 class UserBase(BaseModel):
     phone_number: str
     addresses: List[Address] = []
