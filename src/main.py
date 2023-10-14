@@ -24,8 +24,8 @@ def create_app():
 
 def register_routers(app: FastAPI):
     """ Router includes go here """
-    app.include_router(auth_api_router, prefix="/auth")
-    app.include_router(categories_api_router, prefix="/categories")
-    app.include_router(address_api_router, prefix="/address")
+    app.include_router(auth_api_router, prefix="/auth", tags=["auth"])
+    app.include_router(categories_api_router, prefix="/categories", tags=["categories"])
+    app.include_router(address_api_router, prefix="/address", tags=["address"])
 
 app = create_app()
