@@ -32,7 +32,11 @@ async def upload_image(file: UploadFile = File(...), db: Session = Depends(datab
     ext = os.path.splitext(file.filename)[1]
     random_filename = f"{uuid.uuid4().hex}{ext}"
     
-    s3.upload_fileobj(BytesIO(file_content), 'hypermaakbucket', random_filename)
+    print(file.content_type)
+    s3.upload_fileobj(BytesIO(file_content), 'hypermaakbucket', random_filename, ExtraArgs={
+        'ACL': 'public-read',
+        "ContentType": file.content_type
+    })
     url = f"{s3.meta.endpoint_url}/hypermaakbucket/{random_filename}"
 
     img = models.Image(url=url)
