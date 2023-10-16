@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     admin_email: str
     DATABASE_URL: str
     secret_key: str
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
 
     model_config = SettingsConfigDict(env_file=".env")
 

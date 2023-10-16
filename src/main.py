@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from .apis.auth import router as auth_api_router
 from .apis.categories import router as categories_api_router
 from .apis.address import router as address_api_router
+from .apis.upload import router as upload_api_router
 
  
 def create_app():
@@ -27,5 +28,6 @@ def register_routers(app: FastAPI):
     app.include_router(auth_api_router, prefix="/auth", tags=["auth"])
     app.include_router(categories_api_router, prefix="/categories", tags=["categories"])
     app.include_router(address_api_router, prefix="/address", tags=["address"])
+    app.include_router(upload_api_router, prefix="/upload", tags=["upload"])
 
 app = create_app()

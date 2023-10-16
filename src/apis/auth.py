@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from .. import crud, schema, database
 from ..config import settings
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import random
 import requests
 from jose import jwt, JWTError
@@ -23,23 +23,13 @@ def gene_otp():
     return str(key)
 
 def send_otp(phone, otp):
-    if phone and otp:
-        URL = (
-            "https://2factor.in/API/V1/cebcca8d-5eaf-11ee-addf-0200cd936042/SMS/"
-            + str(phone)
-            + "/"
-            + str(otp)
-            + "/Template1"
-        )
-        resp = requests.get(url=URL)
-        data = resp.json()
-        print(data)
-        if data["Status"] == "Success":
-            return True
-        else:
-            return False
-    else:
+    if not phone or not otp:
         return False
+    URL = f"https://2factor.in/API/V1/cebcca8d-5eaf-11ee-addf-0200cd936042/SMS/{str(phone)}/{str(otp)}/Template1"
+    resp = requests.get(url=URL)
+    data = resp.json()
+    print(data)
+    return data["Status"] == "Success"
 
 @router.post('/phone')
 async def phone(user_phone: str, db: Session = Depends(database.get_db)):
@@ -73,12 +63,11 @@ async def phone(user_phone: str, db: Session = Depends(database.get_db)):
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(days=999999)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+        expire = datetime.now(timezone.utc) + timedelta(days=999999)
+    to_encode["exp"] = expire
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 @router.post('/otp')
 async def otp(user_phone: str, otp:str, db: Session = Depends(database.get_db)):
@@ -129,8 +118,8 @@ async def get_current_user(request: Request, token: Optional[str] = Header(None)
                 raise credentials_exception
         else:
             raise credentials_exception
-    except JWTError:
-        raise credentials_exception
+    except JWTError as e:
+        raise credentials_exception from e
     user = crud.get_user_by_phone(db=db, phone_number=phone_number)
     if user is None:
         raise credentials_exception

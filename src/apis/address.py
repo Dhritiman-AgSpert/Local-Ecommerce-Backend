@@ -20,7 +20,8 @@ def create_address_for_user(
     return crud.create_user_address(db=db, address=address, user_id=current_user.id)
 
 @router.put('{id}', response_model=schema.Address)
-def update_address(id: int, address: schema.AddressUpdate, db: Session = Depends(database.get_db)):
+def update_address(id: int, address: schema.AddressUpdate, db: Session = Depends(database.get_db), _: schema.User = Depends(get_current_user)):
+    # sourcery skip: reintroduce-else, swap-if-else-branches, use-named-expression
     db_address = crud.get_address(db=db, id=id)
     
     if not db_address:
@@ -29,7 +30,7 @@ def update_address(id: int, address: schema.AddressUpdate, db: Session = Depends
     return crud.update_user_address(db=db, address=address)
 
 @router.delete('{id}')
-def delete_address(id: int, db: Session = Depends(database.get_db)):
+def delete_address(id: int, db: Session = Depends(database.get_db), _: schema.User = Depends(get_current_user)):
     db_address = crud.get_address(db=db, id=id)
     
     if not db_address:
