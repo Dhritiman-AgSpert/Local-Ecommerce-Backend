@@ -12,17 +12,17 @@ def get_addresses(db: Session, skip: int = 0, limit: int = 100):
 def validate_address(address: dict, allowed_pincodes: list = models.PINCODE_CHOICES):
     return address["pincode"] in allowed_pincodes
 
-def create_user_address(db: Session, address: schema.AddressCreate, user_id: int):
+def create_buyer_address(db: Session, address: schema.AddressCreate, buyer_id: int):
     if not validate_address(address.model_dump()):
         raise HTTPException(status_code=400, detail="Invalid pincode")
     
-    db_address = models.Address(**address.model_dump(), owner_id=user_id)
+    db_address = models.Address(**address.model_dump(), owner_id=buyer_id)
     db.add(db_address)
     db.commit()
     db.refresh(db_address)
     return db_address
 
-def update_user_address(db: Session, address: schema.AddressUpdate):
+def update_buyer_address(db: Session, address: schema.AddressUpdate):
     if not validate_address(address.model_dump()):
         raise HTTPException(status_code=400, detail="Invalid pincode")
     
@@ -30,7 +30,7 @@ def update_user_address(db: Session, address: schema.AddressUpdate):
     db.commit()
     return get_address(db, id=address.id)
 
-def delete_user_address(db: Session, id: int):
+def delete_buyer_address(db: Session, id: int):
     address = get_address(db, id=id)
     db.delete(address)
     db.commit()
@@ -57,22 +57,22 @@ def update_otp(db: Session, otp: schema.OTPCreate):
     db.refresh(db_otp)
     return db_otp
 
-# User
-def get_user_by_phone(db: Session, phone_number: str):
-    return db.query(models.User).filter(models.User.phone_number == phone_number).first()
+# Buyer
+def get_buyer_by_phone(db: Session, phone_number: str):
+    return db.query(models.Buyer).filter(models.Buyer.phone_number == phone_number).first()
 
-def create_user(db: Session, user: schema.UserCreate):
-    db_user = models.User(phone_number=user.phone_number)
-    db.add(db_user)
+def create_buyer(db: Session, buyer: schema.BuyerCreate):
+    db_buyer = models.Buyer(phone_number=buyer.phone_number)
+    db.add(db_buyer)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(db_buyer)
+    return db_buyer
 
-def get_user(db: Session, user_id: int):
+def get_buyer(db: Session, buyer_id: int):
     return db.query(
-        models.User
+        models.Buyer
     ).filter(
-        models.User.id == user_id
+        models.Buyer.id == buyer_id
     ).options(
-        joinedload(models.User.addresses)
+        joinedload(models.Buyer.addresses)
     ).first()

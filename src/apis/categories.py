@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends
 from .. import schema
 
-from .auth import get_current_user
+from .auth import get_current_buyer
 
 router = APIRouter()
 
 
 @router.get('')
-async def categories(_: schema.User = Depends(get_current_user)):
+async def categories(_: schema.Buyer = Depends(get_current_buyer)):
     return [
         {
             "category": "Hardware",

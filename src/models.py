@@ -18,6 +18,7 @@ class Seller(Base):
     __tablename__ = "sellers"
 
     id = Column(Integer, primary_key=True, index=True)
+    category = Column(String(256), nullable=True)
     name = Column(String(256), nullable=True)
     phone = Column(String(10), nullable=False, unique=True)
     image_url = Column(String, nullable=True)
@@ -54,8 +55,8 @@ class Address(Base):
     pincode = Column(Enum(*PINCODE_CHOICES, name='pincode'), nullable=False)
     lat = Column(Numeric(precision=9, scale=6), nullable=False)
     lng = Column(Numeric(precision=9, scale=6), nullable=False)
-    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    owner = relationship("User", back_populates="addresses")
+    owner_id = Column(Integer, ForeignKey("buyers.id"), nullable=False)
+    owner = relationship("Buyer", back_populates="addresses")
 
 class OTP(Base):
     __tablename__ = "otps"
@@ -66,8 +67,8 @@ class OTP(Base):
     count = Column(Integer, default=0)
     verified = Column(Boolean, default=False)
 
-class User(Base):
-    __tablename__ = "users"
+class Buyer(Base):
+    __tablename__ = "buyers"
 
     id = Column(Integer, primary_key=True, index=True)
     phone_number = Column(String, unique=True, index=True)

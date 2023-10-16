@@ -7,7 +7,7 @@ import os
 import uuid
 
 from .. import models, database, schema, config
-from .auth import get_current_user
+from .auth import get_current_buyer
 
 router = APIRouter()
 
@@ -19,7 +19,7 @@ s3 = boto3.client(
 )
 
 @router.post("/image/")
-async def upload_image(file: UploadFile = File(...), db: Session = Depends(database.get_db), _: schema.User = Depends(get_current_user)):
+async def upload_image(file: UploadFile = File(...), db: Session = Depends(database.get_db), _: schema.Buyer = Depends(get_current_buyer)):
     file_content = await file.read()
 
     # Validate if the file is an image

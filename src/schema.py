@@ -32,10 +32,6 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-class TokenData(BaseModel):
-    username: str | None = None
-    scopes: list[str] = []
-
 # OTP
 class OTPBase(BaseModel):
     otp: str
@@ -52,15 +48,15 @@ class OTP(OTPBase):
     class Config:
         from_attributes = True
 
-# User
-class UserBase(BaseModel):
+# Buyer
+class BuyerBase(BaseModel):
     phone_number: str
     addresses: List[Address] = []
 
-class UserCreate(UserBase):
+class BuyerCreate(BuyerBase):
     pass
 
-class User(UserBase):
+class Buyer(BuyerBase):
     id: int
 
     class Config:

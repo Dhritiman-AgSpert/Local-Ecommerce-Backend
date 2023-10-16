@@ -32,22 +32,22 @@ def send_otp(phone, otp):
     return data["Status"] == "Success"
 
 @router.post('/phone')
-async def phone(user_phone: str, db: Session = Depends(database.get_db)):
+async def phone(buyer_phone: str, db: Session = Depends(database.get_db)):
     
-    otp_in_db = crud.get_otp_by_phone(db=db, phone_number=user_phone)
+    otp_in_db = crud.get_otp_by_phone(db=db, phone_number=buyer_phone)
 
     if otp_in_db and otp_in_db.count >= 10:
         return {"message": "OTP sending limit exceeded. Contact customer service."}
     
-    # Generate OTP and send it to the user 
+    # Generate OTP and send it to the buyer 
     generated_otp = gene_otp()
-    # sent = send_otp(user_phone, generated_otp)
+    # sent = send_otp(buyer_phone, generated_otp)
     sent = True
     
     if sent:
         otp_create = schema.OTPCreate(
             otp=generated_otp, 
-            phone_number=user_phone, 
+            phone_number=buyer_phone, 
             count=(otp_in_db.count if otp_in_db else 0) + 1,
             verified=False
         )
@@ -70,9 +70,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 @router.post('/otp')
-async def otp(user_phone: str, otp:str, db: Session = Depends(database.get_db)):
+async def otp(buyer_phone: str, otp:str, db: Session = Depends(database.get_db)):
     
-    otp_in_db = crud.get_otp_by_phone(db=db, phone_number=user_phone)
+    otp_in_db = crud.get_otp_by_phone(db=db, phone_number=buyer_phone)
     
     if not otp_in_db or otp_in_db.otp != otp or otp_in_db.verified == True:
         raise HTTPException(status_code=400, detail="Invalid OTP")
@@ -84,19 +84,19 @@ async def otp(user_phone: str, otp:str, db: Session = Depends(database.get_db)):
     db.commit()
     db.refresh(otp_in_db)
 
-    # create user if doesn't exist.
-    user_in_db = crud.get_user_by_phone(db=db, phone_number=user_phone)
-    if not user_in_db:
-        user_create = schema.UserCreate(phone_number=user_phone)
-        crud.create_user(db=db, user=user_create)
+    # create buyer if doesn't exist.
+    buyer_in_db = crud.get_buyer_by_phone(db=db, phone_number=buyer_phone)
+    if not buyer_in_db:
+        buyer_create = schema.BuyerCreate(phone_number=buyer_phone)
+        crud.create_buyer(db=db, buyer=buyer_create)
 
     # Create the token
-    access_token = create_access_token(data={"sub": user_phone})
+    access_token = create_access_token(data={"sub": buyer_phone})
     
     return {"access_token": access_token}
 
 
-async def get_current_user(request: Request, token: Optional[str] = Header(None), db: Session = Depends(database.get_db)):
+async def get_current_buyer(request: Request, token: Optional[str] = Header(None), db: Session = Depends(database.get_db)):
     authorization = request.headers.get('Authorization')
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -120,15 +120,15 @@ async def get_current_user(request: Request, token: Optional[str] = Header(None)
             raise credentials_exception
     except JWTError as e:
         raise credentials_exception from e
-    user = crud.get_user_by_phone(db=db, phone_number=phone_number)
-    if user is None:
+    buyer = crud.get_buyer_by_phone(db=db, phone_number=phone_number)
+    if buyer is None:
         raise credentials_exception
-    return user
+    return buyer
 
 
-@router.get("/me", response_model=schema.User)
-async def user_info(current_user: schema.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
-    db_user = crud.get_user(db, user_id=current_user.id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+@router.get("/me", response_model=schema.Buyer)
+async def buyer_info(current_buyer: schema.Buyer = Depends(get_current_buyer), db: Session = Depends(database.get_db)):
+    db_buyer = crud.get_buyer(db, buyer_id=current_buyer.id)
+    if db_buyer is None:
+        raise HTTPException(status_code=404, detail="Buyer not found")
+    return db_buyer
