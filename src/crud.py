@@ -13,6 +13,9 @@ def create_seller(db: Session, seller: schema.SellerCreate):
 def get_seller_by_phone(db: Session, phone_number: str):
     return db.query(models.Seller).filter(models.Seller.phone_number == phone_number).first()
 
+def get_seller(db: Session, id: int):
+    return db.query(models.Seller).filter(models.Seller.id == id).first()
+
 def validate_category(category: str, allowed_categories: list = models.CATEGORY_CHOICES):
     return category in allowed_categories
 
@@ -22,7 +25,7 @@ def update_seller(db: Session, seller: schema.SellerUpdate, seller_id: int):
     
     db.query(models.Seller).filter(models.Seller.id == seller_id).update(seller.model_dump())
     db.commit()
-    return db.query(models.Seller).filter(models.Seller.id == seller_id)
+    return get_seller(db, seller_id)
 
 def get_seller(db: Session, seller_id: int):
     return db.query(

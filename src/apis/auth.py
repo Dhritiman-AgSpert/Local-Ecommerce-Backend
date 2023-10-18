@@ -119,7 +119,7 @@ async def get_current_seller(request: Request, token: Optional[str] = Header(Non
     return seller
 
 
-@router.put("/sellers/", response_model=schema.Seller)
+@router.put("/sellers", response_model=schema.Seller)
 def update_seller(seller: schema.SellerUpdate, current_seller: schema.Seller = Depends(get_current_seller), db: Session = Depends(database.get_db)):
     return crud.update_seller(db=db, seller=seller, seller_id=current_seller.id)
 

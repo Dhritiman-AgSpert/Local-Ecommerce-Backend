@@ -5,7 +5,7 @@ from typing import List, Optional
 # Seller
 class SellerBase(BaseModel):
     phone_number: str
-
+    
 class SellerCreate(SellerBase):
     pass
 
@@ -17,10 +17,18 @@ class SellerUpdate(BaseModel):
     address: Optional[str] = None
     lat: Optional[float] = None
     lng: Optional[float] = None
-
-class Seller(SellerUpdate):
+    
+class Seller(BaseModel):
     id: int
-
+    phone_number: str
+    category: Optional[str] = None
+    name: Optional[str] = None
+    image_url: Optional[str] = None
+    trade_license: Optional[str] = None
+    address: Optional[str] = None
+    lat: Optional[float] = None
+    lng: Optional[float] = None
+    
     class Config:
         from_attributes = True
 
