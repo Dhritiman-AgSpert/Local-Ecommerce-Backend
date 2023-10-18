@@ -2,6 +2,35 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session, joinedload
 from . import models, schema
 
+# Seller
+def create_seller(db: Session, seller: schema.SellerCreate):
+    db_seller = models.Seller(**seller.model_dump())
+    db.add(db_seller)
+    db.commit()
+    db.refresh(db_seller)
+    return db_seller
+
+def get_seller_by_phone(db: Session, phone_number: str):
+    return db.query(models.Seller).filter(models.Seller.phone_number == phone_number).first()
+
+def validate_category(category: str, allowed_categories: list = models.CATEGORY_CHOICES):
+    return category in allowed_categories
+
+def update_seller(db: Session, seller: schema.SellerUpdate, seller_id: int):
+    if not validate_category(seller.model_dump()["category"]):
+        raise HTTPException(status_code=400, detail="Invalid category")    
+    
+    db.query(models.Seller).filter(models.Seller.id == seller_id).update(seller.model_dump())
+    db.commit()
+    return db.query(models.Seller).filter(models.Seller.id == seller_id)
+
+def get_seller(db: Session, seller_id: int):
+    return db.query(
+        models.Seller
+    ).filter(
+        models.Seller.id == seller_id
+    ).first()
+
 # Address
 def get_address(db: Session, id: int):
     return db.query(models.Address).filter(models.Address.id == id).first()

@@ -1,11 +1,34 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
+
+
+# Seller
+class SellerBase(BaseModel):
+    phone_number: str
+
+class SellerCreate(SellerBase):
+    pass
+
+class SellerUpdate(BaseModel):
+    category: Optional[str] = None
+    name: Optional[str] = None
+    image_url: Optional[str] = None
+    trade_license: Optional[str] = None
+    address: Optional[str] = None
+    lat: Optional[float] = None
+    lng: Optional[float] = None
+
+class Seller(SellerUpdate):
+    id: int
+
+    class Config:
+        from_attributes = True
 
 
 # Address
 class AddressBase(BaseModel):
     name: str
-    phone: str
+    phone_number: str
     house: str
     street: str
     area: str

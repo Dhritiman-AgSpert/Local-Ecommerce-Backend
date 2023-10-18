@@ -1,37 +1,48 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum, Numeric, CheckConstraint
+from sqlalchemy import Table, Column, Integer, String, Boolean, ForeignKey, Enum, Numeric, CheckConstraint
 from sqlalchemy.orm import relationship
 from .database import Base
 
+# Association table
+product_seller = Table(
+    'product_seller',
+    Base.metadata,
+    Column('product_id', Integer, ForeignKey('products.id')),
+    Column('seller_id', Integer, ForeignKey('sellers.id'))
+)
 
 class Product(Base):
     __tablename__ = "products"
     
     id = Column(Integer, primary_key=True, index=True)
+    category = Column(String(256), nullable=True)
+    sub_category = Column(String(256), nullable=True)
     name = Column(String(256), nullable=False)
     description = Column(String(1024))
     image_url = Column(String(256), nullable=False)
     price = Column(Numeric(precision=6, scale=2), CheckConstraint('price >= 0'), nullable=False)
-    owner_id = Column(Integer, ForeignKey("sellers.id"), nullable=False)
-    owner = relationship("Seller", back_populates="products")
 
+    # Relationship
+    sellers = relationship("Seller", secondary=product_seller, back_populates="products")
+
+CATEGORY_CHOICES = [
+    "HARDWARE"
+]
 class Seller(Base):
     __tablename__ = "sellers"
 
     id = Column(Integer, primary_key=True, index=True)
-    category = Column(String(256), nullable=True)
+    category = Column(Enum(*CATEGORY_CHOICES, name='category'), nullable=True)
     name = Column(String(256), nullable=True)
-    phone = Column(String(10), nullable=False, unique=True)
+    phone_number = Column(String(10), nullable=False, unique=True)
     image_url = Column(String, nullable=True)
     trade_license = Column(String(64), nullable=True)
     address = Column(String(512), nullable=True)
     lat = Column(Numeric(precision=9, scale=6), nullable=True)
     lng = Column(Numeric(precision=9, scale=6), nullable=True)
-    products = relationship(
-        "Product",
-        cascade="all,delete-orphan",
-        back_populates="owner",
-        uselist=True,
-    )
+    
+    # Relationship
+    products = relationship("Product", secondary=product_seller, back_populates="sellers")
+
 
 class Image(Base):
     __tablename__ = "images"
@@ -47,7 +58,7 @@ class Address(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(256), nullable=False)
-    phone = Column(String(10), nullable=False)
+    phone_number = Column(String(10), nullable=False)
     house = Column(String(256), nullable=False)
     street = Column(String(256), nullable=False)
     area = Column(String(256), nullable=False)
