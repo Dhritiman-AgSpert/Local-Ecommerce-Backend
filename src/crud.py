@@ -2,6 +2,24 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session, joinedload
 from . import models, schema
 
+# Product
+def get_products_for_seller(db: Session, seller_id: int, skip: int = 0, limit: int = 100):
+    return db.query(models.Product).join(models.product_seller).filter(models.product_seller.c.seller_id == seller_id).offset(skip).limit(limit).all()
+
+def create_seller_product(db: Session, product: schema.ProductCreate, seller_id: int):
+    db_product = models.Product(**product.model_dump())
+    db.add(db_product)
+    db.commit()
+    db.refresh(db_product)
+    
+    # Add the product to the seller's products
+    db_seller = db.query(models.Seller).filter(models.Seller.id == seller_id).first()
+    db_seller.products.append(db_product)
+    
+    db.commit()
+    
+    return db_product
+
 # Seller
 def create_seller(db: Session, seller: schema.SellerCreate):
     db_seller = models.Seller(**seller.model_dump())
