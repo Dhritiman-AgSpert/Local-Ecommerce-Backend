@@ -22,5 +22,5 @@ def read_products_for_seller(
     current_seller: models.Seller = Depends(get_current_seller),
     db: Session = Depends(get_db),
 ):
-    products = crud.get_products_for_seller(db=db, seller_id=current_seller.id, skip=skip, limit=limit)
-    return products
+    return crud.get_products_for_seller(db=db, seller_id=current_seller.id, skip=skip, limit=limit)
+
