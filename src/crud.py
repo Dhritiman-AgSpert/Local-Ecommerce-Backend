@@ -59,12 +59,12 @@ def get_address(db: Session, id: int):
 def get_addresses(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Address).offset(skip).limit(limit).all()
 
-def validate_address(address: dict, allowed_pincodes: list = models.PINCODE_CHOICES):
-    return address["pincode"] in allowed_pincodes
+def validate_address(address: dict, allowed_areas: list = models.AREA_CHOICES):
+    return address["area"] in allowed_areas
 
 def create_buyer_address(db: Session, address: schema.AddressCreate, buyer_id: int):
     if not validate_address(address.model_dump()):
-        raise HTTPException(status_code=400, detail="Invalid pincode")
+        raise HTTPException(status_code=400, detail="Invalid area")
     
     db_address = models.Address(**address.model_dump(), owner_id=buyer_id)
     db.add(db_address)

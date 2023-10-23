@@ -7,11 +7,11 @@ from .auth import get_current_buyer
 router = APIRouter()
 
 
-@router.get('/allowed_pincodes')
-def allowed_pincodes(
+@router.get('/allowed_areas')
+def allowed_areas(
     _: schema.Buyer = Depends(get_current_buyer)
 ):
-    return models.PINCODE_CHOICES
+    return models.AREA_CHOICES
 
 @router.post('', response_model=schema.Address)
 def create_address_for_buyer(
