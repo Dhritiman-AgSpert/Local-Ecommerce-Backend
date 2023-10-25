@@ -126,7 +126,7 @@ def update_seller(seller: schema.SellerUpdate, current_seller: schema.Seller = D
 
 @router.get("/seller/me", response_model=schema.Seller)
 async def seller_info(current_seller: schema.Seller = Depends(get_current_seller), db: Session = Depends(database.get_db)):
-    db_seller = crud.get_seller(db, seller_id=current_seller.id)
+    db_seller = crud.get_seller(db, id=current_seller.id)
     if db_seller is None:
         raise HTTPException(status_code=404, detail="seller not found")
     return db_seller

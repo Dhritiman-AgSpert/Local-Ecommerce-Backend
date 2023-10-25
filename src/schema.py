@@ -50,6 +50,17 @@ class Seller(BaseModel):
     class Config:
         from_attributes = True
 
+class SellerWithProducts(Seller):
+    products: List[Product] = []
+    
+    class Config:
+        from_attributes = True
+
+class SellerList(BaseModel):
+    sellers: List[SellerWithProducts] = []
+
+    class Config:
+        from_attributes = True
 
 # Address
 class AddressBase(BaseModel):

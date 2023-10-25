@@ -45,12 +45,11 @@ def update_seller(db: Session, seller: schema.SellerUpdate, seller_id: int):
     db.commit()
     return get_seller(db, seller_id)
 
-def get_seller(db: Session, seller_id: int):
-    return db.query(
-        models.Seller
-    ).filter(
-        models.Seller.id == seller_id
-    ).first()
+def get_all_sellers(db: Session):
+    return db.query(models.Seller).all()
+
+def get_sellers_by_category(db: Session, category: str):
+    return db.query(models.Seller).filter(models.Seller.category == category).options(joinedload(models.Seller.products)).all()
 
 # Address
 def get_address(db: Session, id: int):
@@ -74,7 +73,7 @@ def create_buyer_address(db: Session, address: schema.AddressCreate, buyer_id: i
 
 def update_buyer_address(db: Session, address: schema.AddressUpdate):
     if not validate_address(address.model_dump()):
-        raise HTTPException(status_code=400, detail="Invalid pincode")
+        raise HTTPException(status_code=400, detail="Invalid area")
     
     db.query(models.Address).filter(models.Address.id == address.id).update(address.model_dump())
     db.commit()
