@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, subqueryload
 from . import models, schema
 
 # Product
@@ -118,10 +118,15 @@ def create_buyer(db: Session, buyer: schema.BuyerCreate):
     return db_buyer
 
 def get_buyer(db: Session, buyer_id: int):
-    return db.query(
+    buyer = db.query(
         models.Buyer
     ).filter(
         models.Buyer.id == buyer_id
     ).options(
         joinedload(models.Buyer.addresses)
     ).first()
+    
+    if buyer is not None:
+        buyer.addresses.sort(key=lambda address: address.id, reverse=True)
+    
+    return buyer
