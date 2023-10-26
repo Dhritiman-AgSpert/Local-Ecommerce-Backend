@@ -62,6 +62,11 @@ class SellerList(BaseModel):
     class Config:
         from_attributes = True
 
+# Search
+class SearchResult(BaseModel):
+    products: List[Product]
+    sellers: List[SellerWithProducts]
+
 # Address
 class AddressBase(BaseModel):
     name: str
