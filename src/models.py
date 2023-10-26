@@ -89,6 +89,9 @@ class Product(Base):
     sub_category = Column(String(256), nullable=True)
     name = Column(String(256), nullable=False)
     description = Column(String(1024))
+    unit = Column(String(32))
+    moq = Column(Numeric(precision=6, scale=2))
+    factor = Column(Numeric(precision=6, scale=2))
     image_url = Column(String(256), nullable=False)
     price = Column(Numeric(precision=6, scale=2), CheckConstraint('price >= 0'), nullable=False)
 
