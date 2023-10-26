@@ -99,7 +99,8 @@ class Product(Base):
     sellers = relationship("Seller", secondary=product_seller, back_populates="products")
 
 CATEGORY_CHOICES = [
-    "HARDWARE"
+    "Grocery",
+    "Meat"
 ]
 class Seller(Base):
     __tablename__ = "sellers"

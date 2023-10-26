@@ -7,6 +7,9 @@ class ProductBase(BaseModel):
     sub_category: Optional[str] = None
     name: str
     description: Optional[str] = None
+    unit: Optional[str] = None
+    moq: Optional[float] = None
+    factor: Optional[float] = None
     image_url: str
     price: float
 
