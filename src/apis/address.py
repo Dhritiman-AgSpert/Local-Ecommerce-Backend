@@ -19,7 +19,7 @@ def create_address_for_buyer(
 ):
     return crud.create_buyer_address(db=db, address=address, buyer_id=current_buyer.id)
 
-@router.put('{id}', response_model=schema.Address)
+@router.put('/{id}', response_model=schema.Address)
 def update_address(id: int, address: schema.AddressUpdate, db: Session = Depends(database.get_db), _: schema.Buyer = Depends(get_current_buyer)):
     # sourcery skip: reintroduce-else, swap-if-else-branches, use-named-expression
     db_address = crud.get_address(db=db, id=id)
@@ -29,7 +29,7 @@ def update_address(id: int, address: schema.AddressUpdate, db: Session = Depends
     
     return crud.update_buyer_address(db=db, address=address)
 
-@router.delete('{id}')
+@router.delete('/{id}')
 def delete_address(id: int, db: Session = Depends(database.get_db), _: schema.Buyer = Depends(get_current_buyer)):
     db_address = crud.get_address(db=db, id=id)
     

@@ -7,8 +7,8 @@ import pytz
 
 ORDER_STATUSES = [
     'Creating',
-    'Placed',
     'Pending',
+    'Placed',
     'Shipped', 
     'Delivered', 
     'Cancelled'
@@ -18,6 +18,8 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     total_price = Column(Numeric(precision=10, scale=2), nullable=False)
+    tax = Column(Numeric(precision=10, scale=2), nullable=False, default=0)
+    delivery_charge = Column(Numeric(precision=10, scale=2), nullable=False, default=0)
     status = Column(Enum(*ORDER_STATUSES, name='order_statuses'), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now(tz=pytz.timezone('Asia/Kolkata')))
 
