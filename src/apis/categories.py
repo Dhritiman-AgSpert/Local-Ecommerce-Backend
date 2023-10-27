@@ -14,7 +14,7 @@ async def categories(_: schema.Buyer = Depends(get_current_buyer)):
         if category=="Grocery":
             out.append({
                 "name": category,
-                "url": "https://s3.ap-south-1.amazonaws.com/hypermaakbucket/db277d090fd3441898c88e98994ec739.png"
+                "url": "https://s3.ap-south-1.amazonaws.com/hypermaakbucket/04e486b79bec44aea3cf5cc2f7cf1ac9.png"
             })
         elif category=="Meat":
             out.append({

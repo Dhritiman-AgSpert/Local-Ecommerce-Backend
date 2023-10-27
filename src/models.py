@@ -94,6 +94,7 @@ class Product(Base):
     unit = Column(String(32), nullable=False)
     moq = Column(Numeric(precision=6, scale=2), nullable=False)
     factor = Column(Numeric(precision=6, scale=2), nullable=False)
+    weight = Column(Numeric(precision=6, scale=2), nullable=False)
     image_url = Column(String(256), nullable=False)
     price = Column(Numeric(precision=6, scale=2), CheckConstraint('price >= 0'), nullable=False)
 
