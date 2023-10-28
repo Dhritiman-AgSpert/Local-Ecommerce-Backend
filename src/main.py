@@ -6,6 +6,7 @@ from .apis.upload import router as upload_api_router
 from .apis.product import router as product_api_router
 from .apis.search import router as search_api_router
 from .apis.seller import router as seller_api_router
+from .apis.order import router as order_api_router
 from .apis.payment import router as payment_api_router
 
  
@@ -36,6 +37,7 @@ def register_routers(app: FastAPI):
     app.include_router(product_api_router, prefix="/product", tags=["product"])
     app.include_router(search_api_router, prefix="/search", tags=["search"])
     app.include_router(seller_api_router, prefix="/seller", tags=["seller"])
+    app.include_router(order_api_router, prefix="/order", tags=["order"])
     app.include_router(payment_api_router, prefix="/payment", tags=["payment"])
 
 app = create_app()

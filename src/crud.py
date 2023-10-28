@@ -1,6 +1,47 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session, joinedload, subqueryload
 from . import models, schema
+from decimal import Decimal
+
+# Order
+def get_product(db: Session, product_id: int):
+    return db.query(models.Product).filter(models.Product.id == product_id).first()
+
+def create_order(db: Session, order: schema.OrderCreate, buyer_id: int):
+    total_price = 0
+    for item in order.order_items:
+        product = get_product(db=db, product_id=item.product_id)
+        unit_price = product.price
+        quantity = item.quantity
+        total_price += unit_price * quantity
+
+    db_order = models.Order(
+        seller_id=order.seller_id,
+        status='Pending',
+        total_price=total_price,
+        buyer_id=buyer_id
+    )
+
+    db.add(db_order)
+    db.commit()
+
+    for item in order.order_items:
+        db_item = models.OrderItem(
+            product_id=item.product_id,
+            quantity=item.quantity,
+            order_id=db_order.id,
+            price_per_item=unit_price
+        )
+        db.add(db_item)
+
+    db_order.delivery_charge = 10
+    db_order.tax = db_order.total_price * Decimal(0.18)  # 18% tax
+    db_order.gross_total = db_order.total_price + db_order.tax + db_order.delivery_charge
+
+    db.commit()
+    db.refresh(db_order)
+    
+    return db_order
 
 # Product
 def get_products_for_seller(db: Session, seller_id: int, skip: int = 0, limit: int = 100):

@@ -1,6 +1,29 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
+# Order
+class OrderItemBase(BaseModel):
+    product_id: int
+    quantity: int
+
+class OrderBase(BaseModel):
+    seller_id: int
+    order_items: List[OrderItemBase]
+
+class OrderCreate(OrderBase):
+    pass
+
+class Order(OrderBase):
+    id: int
+    status: str
+    total_price: float
+    delivery_charge: float = 0.0
+    tax: float = 0.0
+    gross_total: float
+
+    class Config:
+        from_attributes = True
+
 # Product
 class ProductBase(BaseModel):
     category: Optional[str] = None
