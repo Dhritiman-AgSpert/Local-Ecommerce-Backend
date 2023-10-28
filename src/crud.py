@@ -1,7 +1,10 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session, joinedload, subqueryload
+from typing import List
 from . import models, schema
 from decimal import Decimal
+import csv
+import io
 
 # Order
 def get_product(db: Session, product_id: int):
@@ -60,6 +63,25 @@ def create_seller_product(db: Session, product: schema.ProductCreate, seller_id:
     db.commit()
     
     return db_product
+
+def create_products_from_csv(db: Session, csv_file: UploadFile) -> List[models.Product]:
+    products = []
+    
+    # Decode file content
+    decoded_file = csv_file.read().decode()
+    
+    # Use StringIO to turn the decoded content into a file-like object
+    file_like_object = io.StringIO(decoded_file)
+    
+    csv_reader = csv.DictReader(file_like_object)
+    
+    for row in csv_reader:
+        seller_id = row.pop("seller_id")
+        product_data = schema.ProductCSV(**row)
+        product = create_seller_product(db, product_data, seller_id)
+        products.append(product)
+    
+    return products
 
 # Seller
 def create_seller(db: Session, seller: schema.SellerCreate):

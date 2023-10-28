@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File
 from typing import List
 from sqlalchemy.orm import Session
 from .. import crud, models, schema
@@ -24,3 +24,6 @@ def read_products_for_seller(
 ):
     return crud.get_products_for_seller(db=db, seller_id=current_seller.id, skip=skip, limit=limit)
 
+@router.post("/uploadcsv/")
+async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    return crud.create_products_from_csv(db, file.file)

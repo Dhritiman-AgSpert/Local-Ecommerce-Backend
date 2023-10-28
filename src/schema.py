@@ -25,6 +25,20 @@ class Order(OrderBase):
         from_attributes = True
 
 # Product
+class ProductCSV(BaseModel):
+    id: Optional[int]
+    name: str
+    category: Optional[str]
+    sub_category: Optional[str]
+    description: Optional[str]
+    unit: str
+    moq: float
+    factor: float
+    weight: float
+    image_url: str
+    price: float
+    # seller_id: int
+    
 class ProductBase(BaseModel):
     category: Optional[str] = None
     sub_category: Optional[str] = None
