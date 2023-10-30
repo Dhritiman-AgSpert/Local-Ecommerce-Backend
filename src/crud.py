@@ -1,5 +1,5 @@
 from fastapi import HTTPException, UploadFile
-from sqlalchemy.orm import Session, joinedload, subqueryload
+from sqlalchemy.orm import Session, joinedload
 from typing import List
 from . import models, schema
 from decimal import Decimal
@@ -64,7 +64,40 @@ def create_seller_product(db: Session, product: schema.ProductCreate, seller_id:
     
     return db_product
 
-def create_products_from_csv(db: Session, csv_file: UploadFile) -> List[models.Product]:
+def create_or_update_seller_product(db: Session, product_data: schema.ProductCreate, seller_ids: List[int]):
+    # Check if the product already exists
+    product = db.query(models.Product).filter(models.Product.name == product_data.name).first()
+
+    if product is None:
+        # If the product does not exist, create a new one
+        product = models.Product(**product_data.model_dump())
+        db.add(product)
+        db.commit()
+        db.refresh(product)
+    else:
+        # If the product exists, update its fields
+        for key, value in product_data.model_dump().items():
+            setattr(product, key, value)
+        db.commit()
+
+    # Get all sellers from the database
+    all_sellers = db.query(models.Seller).all()
+
+    for seller in all_sellers:
+        if seller.id in seller_ids:
+            # If the seller is in 'seller_ids' and the product is not assigned to the seller, assign it
+            if product not in seller.products:
+                seller.products.append(product)
+        else:
+            # If the seller is not in 'seller_ids' and the product is assigned to the seller, unassign it
+            if product in seller.products:
+                seller.products.remove(product)
+
+    db.commit()
+    
+    return product
+
+def create_or_update_products_from_csv(db: Session, csv_file: UploadFile) -> List[models.Product]:
     products = []
     
     # Decode file content
@@ -76,9 +109,10 @@ def create_products_from_csv(db: Session, csv_file: UploadFile) -> List[models.P
     csv_reader = csv.DictReader(file_like_object)
     
     for row in csv_reader:
-        seller_id = row.pop("seller_id")
         product_data = schema.ProductCSV(**row)
-        product = create_seller_product(db, product_data, seller_id)
+        product_create_data = schema.ProductCreate(**product_data.model_dump(exclude={"seller_ids"}))
+        seller_ids = [int(id) for id in product_data.seller_ids.split(',')]
+        product = create_or_update_seller_product(db, product_create_data, seller_ids)
         products.append(product)
     
     return products

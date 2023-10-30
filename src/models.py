@@ -89,7 +89,7 @@ class Product(Base):
     id = Column(Integer, primary_key=True, index=True)
     category = Column(String(256), nullable=True)
     sub_category = Column(String(256), nullable=True)
-    name = Column(String(256), nullable=False)
+    name = Column(String(256), nullable=False, unique=True)
     description = Column(String(1024))
     unit = Column(String(32), nullable=False)
     moq = Column(Numeric(precision=6, scale=2), nullable=False)

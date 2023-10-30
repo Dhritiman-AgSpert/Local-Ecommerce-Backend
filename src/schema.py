@@ -26,18 +26,17 @@ class Order(OrderBase):
 
 # Product
 class ProductCSV(BaseModel):
-    id: Optional[int]
     name: str
-    category: Optional[str]
-    sub_category: Optional[str]
-    description: Optional[str]
+    category: Optional[str] = None
+    sub_category: Optional[str] = None
+    description: Optional[str] = None
     unit: str
     moq: float
     factor: float
     weight: float
     image_url: str
     price: float
-    # seller_id: int
+    seller_ids: str
     
 class ProductBase(BaseModel):
     category: Optional[str] = None

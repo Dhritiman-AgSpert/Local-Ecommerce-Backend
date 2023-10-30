@@ -15,7 +15,7 @@ def create_product_for_seller(
 ):
     return crud.create_seller_product(db=db, product=product, seller_id=current_seller.id)
 
-@router.get('', response_model=List[schema.Product])
+@router.get('s', response_model=List[schema.Product])
 def read_products_for_seller(
     skip: int = 0, 
     limit: int = 100, 
@@ -24,6 +24,6 @@ def read_products_for_seller(
 ):
     return crud.get_products_for_seller(db=db, seller_id=current_seller.id, skip=skip, limit=limit)
 
-@router.post("/uploadcsv", response_model=List[schema.Product])
+@router.post("/uploadcsv/", response_model=List[schema.Product])
 async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    return crud.create_products_from_csv(db, file.file)
+    return crud.create_or_update_products_from_csv(db, file.file)
