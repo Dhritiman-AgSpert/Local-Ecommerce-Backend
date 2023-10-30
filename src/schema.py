@@ -46,6 +46,7 @@ class ProductBase(BaseModel):
     unit: Optional[str] = None
     moq: Optional[float] = None
     factor: Optional[float] = None
+    weight: float
     image_url: str
     price: float
 

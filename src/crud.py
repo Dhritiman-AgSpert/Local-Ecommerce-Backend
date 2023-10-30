@@ -5,6 +5,10 @@ from . import models, schema
 from decimal import Decimal
 import csv
 import io
+import razorpay
+
+client = razorpay.Client(auth=("rzp_test_vdMDnNv4ti7PPY", "pma6yie7E9PKpyriozPweyLU"))
+
 
 # Order
 def get_product(db: Session, product_id: int):
@@ -40,6 +44,14 @@ def create_order(db: Session, order: schema.OrderCreate, buyer_id: int):
     db_order.delivery_charge = 10
     db_order.tax = db_order.total_price * Decimal(0.18)  # 18% tax
     db_order.gross_total = db_order.total_price + db_order.tax + db_order.delivery_charge
+
+    # rzp_order = client.order.create({
+    #     "amount": 50000,
+    #     "currency": "INR",
+    #     "receipt": "receipt#1",
+    #     "partial_payment":False,
+    #     "notes": {}
+    # })
 
     db.commit()
     db.refresh(db_order)
